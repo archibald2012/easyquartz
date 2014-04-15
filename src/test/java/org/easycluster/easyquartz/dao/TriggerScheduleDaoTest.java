@@ -40,10 +40,10 @@ public class TriggerScheduleDaoTest extends AbstractJUnit4SpringContextTests {
 		List<TriggerSchedule> schedules = triggerScheduleDao.loadAll();
 		assertTrue(schedules.size() > 0);
 
-		schedules = triggerScheduleDao.queryUnscheduled("prod1");
+		schedules = triggerScheduleDao.queryByInstance("prod1", null);
 		assertTrue(schedules.size() > 0);
 
-		schedules = triggerScheduleDao.queryUnscheduled("prod2");
+		schedules = triggerScheduleDao.queryByInstance("prod2", null);
 		assertEquals(0, schedules.size());
 
 		String lockInstance = SystemUtil.getHostName();

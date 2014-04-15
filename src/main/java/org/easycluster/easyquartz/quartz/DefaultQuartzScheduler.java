@@ -70,7 +70,7 @@ public class DefaultQuartzScheduler extends AbstractQuartzScheduler implements
 	private void scheduleJob() {
 
 		List<TriggerSchedule> triggerSchedules = triggerScheduleDao
-				.queryUnscheduled(namespace);
+				.queryByInstance(namespace, lockInstance);
 		Map<String, TriggerSchedule> newJobs = new HashMap<String, TriggerSchedule>();
 		for (TriggerSchedule triggerSchedule : triggerSchedules) {
 			String key = triggerSchedule.getGroupName() + "-"
@@ -78,7 +78,7 @@ public class DefaultQuartzScheduler extends AbstractQuartzScheduler implements
 			newJobs.put(key, triggerSchedule);
 		}
 
-		// unschedule removed/updated ones.
+		// unschedule removed ones.
 		List<TriggerSchedule> needRemove = new ArrayList<TriggerSchedule>();
 		for (TriggerSchedule snapshot : scheduled.values()) {
 			String key = snapshot.getGroupName() + "-"
@@ -108,14 +108,26 @@ public class DefaultQuartzScheduler extends AbstractQuartzScheduler implements
 
 			TriggerSchedule old = scheduled.get(key);
 			if (old != null) {
-				if (!old.equals(triggerSchedule)) {
-					triggerScheduleDao.updateLockTime(triggerSchedule.getId(),
-							triggerSchedule.getGmtModified(), lockInstance);
-					TimeSchedule timeSchedule = transform(triggerSchedule);
-					scheduleJob(timeSchedule, processor);
-					scheduled.put(key, triggerSchedule);
+				boolean updated = triggerScheduleDao.updateLockTime(
+						triggerSchedule.getId(),
+						triggerSchedule.getGmtModified(), lockInstance);
+				if (updated) {
+					if (!old.equals(triggerSchedule)) {
+						unscheduleJob(triggerSchedule.getScheduleName(),
+								triggerSchedule.getGroupName());
+						scheduled.remove(triggerSchedule.getGroupName() + "-"
+								+ triggerSchedule.getScheduleName());
+						TimeSchedule timeSchedule = transform(triggerSchedule);
+						scheduleJob(timeSchedule, processor);
+						scheduled.put(key, triggerSchedule);
+					} else {
+						// do nothing
+					}
 				} else {
-					// do nothing
+					unscheduleJob(triggerSchedule.getScheduleName(),
+							triggerSchedule.getGroupName());
+					scheduled.remove(triggerSchedule.getGroupName() + "-"
+							+ triggerSchedule.getScheduleName());
 				}
 			} else {
 				boolean acquired = triggerScheduleDao.acquireLock(

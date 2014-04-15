@@ -5,6 +5,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 public class TriggerSchedule implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -207,40 +212,18 @@ public class TriggerSchedule implements Serializable {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((groupName == null) ? 0 : groupName.hashCode());
-		result = prime * result
-				+ ((scheduleName == null) ? 0 : scheduleName.hashCode());
-		return result;
+		return new HashCodeBuilder(31, 1).append(id).toHashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		TriggerSchedule other = (TriggerSchedule) obj;
-		if (groupName == null) {
-			if (other.groupName != null)
-				return false;
-		} else if (!groupName.equals(other.groupName))
-			return false;
-		if (scheduleName == null) {
-			if (other.scheduleName != null)
-				return false;
-		} else if (!scheduleName.equals(other.scheduleName))
-			return false;
-		return true;
+		return EqualsBuilder.reflectionEquals(this, obj, new String[] {
+				"gmtModified", "lockInstance", "masterTime", "updatedAt" });
 	}
 
 	@Override
 	public String toString() {
-		return groupName + ":" + scheduleName;
+		return ToStringBuilder.reflectionToString(this,
+				ToStringStyle.SHORT_PREFIX_STYLE);
 	}
-
 }

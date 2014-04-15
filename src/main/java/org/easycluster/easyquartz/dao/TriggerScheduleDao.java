@@ -25,7 +25,7 @@ public class TriggerScheduleDao {
 
 	private final String QUERY_ALL_SCHEDULE = "select id,processor,group_name,schedule_name,cron_expression,start_time,end_time,start_delay,end_delay,delay_unit,repeat_count,repeat_time,repeat_unit,misfire_instruction,namespace,gmt_create,gmt_modified,lock_instance,master_time,updated_at from trigger_schedule where updated_at is null or updated_at < date_sub(now(), interval 1 minute)";
 
-	private final String QUERY_SCHEDULE_BY_NAMESPACE = "select id,processor,group_name,schedule_name,cron_expression,start_time,end_time,start_delay,end_delay,delay_unit,repeat_count,repeat_time,repeat_unit,misfire_instruction,namespace,gmt_create,gmt_modified,lock_instance,master_time,updated_at from trigger_schedule where namespace = ? and (updated_at is null or updated_at < date_sub(now(), interval 1 minute))";
+	private final String QUERY_SCHEDULE_BY_INSTANCE = "select id,processor,group_name,schedule_name,cron_expression,start_time,end_time,start_delay,end_delay,delay_unit,repeat_count,repeat_time,repeat_unit,misfire_instruction,namespace,gmt_create,gmt_modified,lock_instance,master_time,updated_at from trigger_schedule where namespace = ? and (lock_instance = ? or lock_instance is null or updated_at < date_sub(now(), interval 1 minute))";
 
 	private final String QUERY_SCHEDULE_BY_ID = "select id,processor,group_name,schedule_name,cron_expression,start_time,end_time,start_delay,end_delay,delay_unit,repeat_count,repeat_time,repeat_unit,misfire_instruction,namespace,gmt_create,gmt_modified,lock_instance,master_time,updated_at from trigger_schedule where id = ?";
 
@@ -92,13 +92,10 @@ public class TriggerScheduleDao {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<TriggerSchedule> queryUnscheduled(String namespace) {
-		if (namespace == null || namespace.length() == 0) {
-			return loadAll();
-		} else {
-			return jdbcTemplate.query(QUERY_SCHEDULE_BY_NAMESPACE,
-					new Object[] { namespace }, triggerScheduleRowMapper);
-		}
+	public List<TriggerSchedule> queryByInstance(String namespace,
+			String lockInstance) {
+		return jdbcTemplate.query(QUERY_SCHEDULE_BY_INSTANCE, new Object[] {
+				namespace, lockInstance }, triggerScheduleRowMapper);
 	}
 
 	public TriggerSchedule load(int id) {

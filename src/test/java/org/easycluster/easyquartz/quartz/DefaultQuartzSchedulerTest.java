@@ -25,17 +25,46 @@ public class DefaultQuartzSchedulerTest extends
 		TriggerSchedule schedule = new TriggerSchedule();
 		schedule.setScheduleName("自动发布");
 		schedule.setProcessor("echoClosure");
-		schedule.setCronExpression("0/5 * * * * ?");
+		schedule.setCronExpression("0/1 * * * * ?");
 		schedule.setNamespace("DefaultQuartzSchedulerTest");
 		schedule.putAttribute("id", "1");
 
 		boolean result = triggerScheduleDao.insert(schedule);
 		assertTrue(result);
-		
-		Thread.sleep(60000L);
-		
-		result =triggerScheduleDao.delete(schedule.getId());
+
+		TriggerSchedule schedule2 = new TriggerSchedule();
+		schedule2.setScheduleName("自动发布2");
+		schedule2.setProcessor("echoClosure2");
+		schedule2.setCronExpression("0/1 * * * * ?");
+		schedule2.setNamespace("DefaultQuartzSchedulerTest");
+		schedule2.putAttribute("id", "2");
+
+		result = triggerScheduleDao.insert(schedule2);
 		assertTrue(result);
+
+		Thread.sleep(10000L);
+
+		TriggerSchedule schedule3 = new TriggerSchedule();
+		schedule3.setScheduleName("自动发布3");
+		schedule3.setProcessor("echoClosure3");
+		schedule3.setCronExpression("0/1 * * * * ?");
+		schedule3.setNamespace("DefaultQuartzSchedulerTest");
+		schedule3.putAttribute("id", "3");
+
+		result = triggerScheduleDao.insert(schedule3);
+		assertTrue(result);
+
+		result = triggerScheduleDao.delete(schedule.getId());
+		assertTrue(result);
+
+		Thread.sleep(10000L);
+
+		result = triggerScheduleDao.delete(schedule2.getId());
+		assertTrue(result);
+		result = triggerScheduleDao.delete(schedule3.getId());
+		assertTrue(result);
+		
+		Thread.sleep(10000L);
 	}
 
 }

@@ -28,6 +28,8 @@
 	</bean>
 
 	<bean id="echoClosure" class="org.easycluster.easyquartz.quartz.EchoClosure" />
+	<bean id="echoClosure2" class="org.easycluster.easyquartz.quartz.EchoClosure2" />
+	<bean id="echoClosure3" class="org.easycluster.easyquartz.quartz.EchoClosure3" />
 
 	<bean id="triggerScheduleDao" class="org.easycluster.easyquartz.dao.TriggerScheduleDao">
 		<property name="dataSource" ref="dataSource" />
