@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.easycluster</groupId>
 	<artifactId>easyquartz</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>easyquartz</name>
 	<description>EasyQuartz is a framework to provide distributed quartz mechanism to support schedule job in large scalable distributed applications.</description>
@@ -19,9 +19,9 @@
 	</licenses>
 
 	<scm>
-		<url>scm:git:https://github.com/archibald2012/easylock.git</url>
-		<connection>scm:git:https://github.com/archibald2012/easylock.git</connection>
-		<developerConnection>scm:git:https://github.com/archibald2012/easylock.git</developerConnection>
+		<url>scm:git:https://github.com/archibald2012/easyquartz.git</url>
+		<connection>scm:git:https://github.com/archibald2012/easyquartz.git</connection>
+		<developerConnection>scm:git:https://github.com/archibald2012/easyquartz.git</developerConnection>
 	</scm>
 
 	<developers>
