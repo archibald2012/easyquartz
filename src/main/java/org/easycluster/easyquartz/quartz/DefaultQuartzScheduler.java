@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.easycluster.easyquartz.Closure;
@@ -21,7 +19,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
 public class DefaultQuartzScheduler extends AbstractQuartzScheduler implements
-		BeanFactoryAware {
+		BeanFactoryAware, Closure {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(DefaultQuartzScheduler.class);
 
@@ -31,9 +29,6 @@ public class DefaultQuartzScheduler extends AbstractQuartzScheduler implements
 	private BeanFactory beanFactory;
 	private String namespace;
 
-	private long refreshDelay = 5;
-	private ScheduledExecutorService updateChecker = Executors
-			.newSingleThreadScheduledExecutor();
 	private Map<String, TriggerSchedule> scheduled = new HashMap<String, TriggerSchedule>();
 	private String lockInstance = SystemUtil.getHostName() + ":"
 			+ SystemUtil.getPid();
@@ -43,17 +38,10 @@ public class DefaultQuartzScheduler extends AbstractQuartzScheduler implements
 
 		scheduleJob();
 
-		updateChecker.scheduleWithFixedDelay(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					scheduleJob();
-				} catch (Throwable t) {
-					LOGGER.error("", t);
-				}
-			}
-		}, refreshDelay, refreshDelay, TimeUnit.SECONDS);
+		TimeSchedule timeSchedule = new TimeSchedule();
+		timeSchedule.setScheduleName("ScanTriggerScheduls");
+		timeSchedule.setCronExpression("0/10 * * * * ?");
+		scheduleJob(timeSchedule, this);
 
 		startScheduler();
 
@@ -65,6 +53,11 @@ public class DefaultQuartzScheduler extends AbstractQuartzScheduler implements
 
 	public void stop() {
 		shutdownScheduler();
+	}
+
+	@Override
+	public void execute(Object msg) {
+		scheduleJob();
 	}
 
 	private void scheduleJob() {
