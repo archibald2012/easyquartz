@@ -27,6 +27,8 @@ public class TriggerScheduleDao {
 
 	private final String QUERY_SCHEDULE_BY_INSTANCE = "select id,processor,group_name,schedule_name,cron_expression,start_time,end_time,start_delay,end_delay,delay_unit,repeat_count,repeat_time,repeat_unit,misfire_instruction,namespace,gmt_create,gmt_modified,lock_instance,master_time,updated_at from trigger_schedule where namespace = ? and (lock_instance = ? or lock_instance is null or updated_at < date_sub(now(), interval 1 minute))";
 
+	private final String QUERY_SCHEDULE_BY_SCHEDULE_NAME = "select id,processor,group_name,schedule_name,cron_expression,start_time,end_time,start_delay,end_delay,delay_unit,repeat_count,repeat_time,repeat_unit,misfire_instruction,namespace,gmt_create,gmt_modified,lock_instance,master_time,updated_at from trigger_schedule where schedule_name = ?";
+
 	private final String QUERY_SCHEDULE_BY_ID = "select id,processor,group_name,schedule_name,cron_expression,start_time,end_time,start_delay,end_delay,delay_unit,repeat_count,repeat_time,repeat_unit,misfire_instruction,namespace,gmt_create,gmt_modified,lock_instance,master_time,updated_at from trigger_schedule where id = ?";
 
 	private final String QUERY_SCHEDULE_ATTRIBUTE = "select schedule_id, name, value from trigger_schedule_attribute where schedule_id = ?";
@@ -96,6 +98,20 @@ public class TriggerScheduleDao {
 			String lockInstance) {
 		return jdbcTemplate.query(QUERY_SCHEDULE_BY_INSTANCE, new Object[] {
 				namespace, lockInstance }, triggerScheduleRowMapper);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<TriggerSchedule> queryByScheduleName(String scheduleName,
+			String groupName) {
+		if (groupName == null) {
+			return jdbcTemplate.query(QUERY_SCHEDULE_BY_SCHEDULE_NAME
+					+ " and group_name is null", new Object[] { scheduleName },
+					triggerScheduleRowMapper);
+		} else {
+			return jdbcTemplate.query(QUERY_SCHEDULE_BY_SCHEDULE_NAME
+					+ " and group_name = ?", new Object[] { scheduleName,
+					groupName }, triggerScheduleRowMapper);
+		}
 	}
 
 	public TriggerSchedule load(int id) {

@@ -56,6 +56,10 @@ public class TriggerScheduleDaoTest extends AbstractJUnit4SpringContextTests {
 				schedule.getGmtModified(), lockInstance);
 		assertTrue(result);
 
+		List<TriggerSchedule> list = triggerScheduleDao.queryByScheduleName(
+				schedule.getScheduleName(), schedule.getGroupName());
+		assertEquals(schedule, list.get(0));
+
 		result = triggerScheduleDao.delete(schedule.getId());
 		assertTrue(result);
 	}
